@@ -18,9 +18,15 @@ export const registerUser = async (
     const result = await createUser(userData);
 
     if (result.success) {
-      res.status(201).json({ success: true, user: result.user });
+      res.status(result.statusCode).json({
+        success: true,
+        message: result.message,
+        data: result.data,
+      });
     } else {
-      res.status(500).json({ success: false, message: result.error });
+      res
+        .status(result.statusCode)
+        .json({ success: false, message: result.message });
     }
   } catch (error) {
     res.status(500).send("Error while processing the request.");

@@ -9,7 +9,7 @@ if (!fs.existsSync(storeFolder)) {
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: path.resolve(storeFolder, "Capital-Fund.db"),
+  storage: path.resolve(storeFolder, "Dream-Traders.db"),
 });
 
 export default sequelize;
