@@ -56,20 +56,46 @@ const User = sequelize.define(
     },
   },
   {
-    tableName: "users", // Table name in the database
-    timestamps: true, // Enable timestamps (createdAt, updatedAt)
+    tableName: "users",
+    timestamps: true,
   }
 );
 
-// Function to check if a user already exists by email
 async function checkIfUserExists(email: string) {
   const existingUser = await User.findOne({
     where: { email },
+    attributes: [
+      "id",
+      "userName",
+      "email",
+      "phoneNumber",
+      "passwordHash",
+      "salt",
+      "userRole",
+    ],
   });
   return existingUser;
 }
 
-// Function to create a user
+async function assignRefreshToken(
+  id: string,
+  newUserData: { refreshToken?: string; expiresAt?: Date }
+) {
+  try {
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const updatedUser = await user.update(newUserData);
+
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function createUser(userData: {
   userName: string;
   email: string;
@@ -81,7 +107,6 @@ async function createUser(userData: {
   return user;
 }
 
-// Function to seed a Super Admin if it doesn't exist
 async function seedSuperAdmin() {
   const existingAdmin = await checkIfUserExists("admin@example.com");
 
@@ -90,8 +115,8 @@ async function seedSuperAdmin() {
       userName: "Super Admin",
       email: "admin@example.com",
       phoneNumber: "1234567890",
-      passwordHash: "yourHashedPasswordHere", // Replace with actual hash
-      salt: "randomSaltHere", // Replace with actual salt
+      passwordHash: "yourHashedPasswordHere",
+      salt: "randomSaltHere",
     });
 
     console.log("✅ Super Admin seeded successfully.");
@@ -100,4 +125,10 @@ async function seedSuperAdmin() {
   }
 }
 
-export { User, createUser, checkIfUserExists, seedSuperAdmin };
+export {
+  User,
+  createUser,
+  checkIfUserExists,
+  seedSuperAdmin,
+  assignRefreshToken,
+};
